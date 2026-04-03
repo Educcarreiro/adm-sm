@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
+import { Eye, EyeOff } from "lucide-react";
 
 interface AddUserModalProps {
   open: boolean;
@@ -36,19 +37,15 @@ export function AddUserModal({ open, onClose, onAdd }: AddUserModalProps) {
     role: "Suporte",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const getRolePermissions = (role: string): string[] => {
     switch (role) {
-      case "Admin":
-        return ["all"];
-      case "PMO":
-        return ["view_clients", "manage_tickets", "manage_upsells", "view_analytics"];
-      case "Desenvolvedor":
-        return ["view_clients", "manage_tickets", "view_analytics"];
-      case "Suporte":
-        return ["view_clients", "manage_tickets"];
-      default:
-        return ["view_clients"];
+      case "Administrador": return ["all"];
+      case "PMO": return ["view_clients", "manage_tickets", "manage_upsells", "view_analytics"];
+      case "Desenvolvedor Sênior": return ["view_clients", "manage_tickets", "view_analytics"];
+      case "Suporte": return ["view_clients", "manage_tickets"];
+      default: return ["view_clients"];
     }
   };
 
@@ -61,12 +58,8 @@ export function AddUserModal({ open, onClose, onAdd }: AddUserModalProps) {
       permissions: getRolePermissions(formData.role),
       password: formData.password,
     });
-    setFormData({
-      name: "",
-      email: "",
-      role: "Suporte",
-      password: "",
-    });
+    setFormData({ name: "", email: "", role: "Suporte", password: "" });
+    setShowPassword(false);
     onClose();
   };
 
@@ -82,11 +75,8 @@ export function AddUserModal({ open, onClose, onAdd }: AddUserModalProps) {
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div>
-            <Label htmlFor="name" className="text-gray-300">
-              Nome Completo
-            </Label>
+            <Label className="text-gray-300">Nome Completo</Label>
             <Input
-              id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="bg-[#0a1929]/80 border-white/10 text-white mt-2"
@@ -96,11 +86,8 @@ export function AddUserModal({ open, onClose, onAdd }: AddUserModalProps) {
           </div>
 
           <div>
-            <Label htmlFor="email" className="text-gray-300">
-              Email
-            </Label>
+            <Label className="text-gray-300">Email</Label>
             <Input
-              id="email"
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -111,53 +98,46 @@ export function AddUserModal({ open, onClose, onAdd }: AddUserModalProps) {
           </div>
 
           <div>
-            <Label htmlFor="role" className="text-gray-300">
-              Cargo
-            </Label>
-            <Select
-              value={formData.role}
-              onValueChange={(value) => setFormData({ ...formData, role: value })}
-            >
+            <Label className="text-gray-300">Cargo</Label>
+            <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
               <SelectTrigger className="bg-[#0a1929]/80 border-white/10 text-white mt-2">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-[#0f1c2e] border-white/10">
-                <SelectItem value="Admin">Admin</SelectItem>
+                <SelectItem value="Administrador">Administrador</SelectItem>
                 <SelectItem value="PMO">PMO</SelectItem>
-                <SelectItem value="Desenvolvedor">Desenvolvedor</SelectItem>
+                <SelectItem value="Desenvolvedor Sênior">Desenvolvedor Sênior</SelectItem>
                 <SelectItem value="Suporte">Suporte</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div>
-            <Label htmlFor="password" className="text-gray-300">
-              Senha Inicial
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="bg-[#0a1929]/80 border-white/10 text-white mt-2"
-              placeholder="••••••••"
-              required
-            />
+            <Label className="text-gray-300">Senha Inicial</Label>
+            <div className="relative mt-2">
+              <Input
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="bg-[#0a1929]/80 border-white/10 text-white pr-10"
+                placeholder="••••••••"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="flex-1 border-white/10 hover:bg-white/5"
-            >
+            <Button type="button" variant="outline" onClick={onClose} className="flex-1 border-white/10 hover:bg-white/5">
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white"
-            >
+            <Button type="submit" className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white">
               Criar Usuário
             </Button>
           </div>

@@ -9,6 +9,7 @@ import {
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
+import { Eye, EyeOff } from "lucide-react";
 
 interface ChangePasswordModalProps {
   open: boolean;
@@ -17,14 +18,11 @@ interface ChangePasswordModalProps {
   onChangePassword: (newPassword: string) => void;
 }
 
-export function ChangePasswordModal({
-  open,
-  onClose,
-  userName,
-  onChangePassword,
-}: ChangePasswordModalProps) {
+export function ChangePasswordModal({ open, onClose, userName, onChangePassword }: ChangePasswordModalProps) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -35,7 +33,6 @@ export function ChangePasswordModal({
       setError("As senhas não coincidem");
       return;
     }
-
     if (password.length < 6) {
       setError("A senha deve ter pelo menos 6 caracteres");
       return;
@@ -44,6 +41,8 @@ export function ChangePasswordModal({
     onChangePassword(password);
     setPassword("");
     setConfirmPassword("");
+    setShowPassword(false);
+    setShowConfirm(false);
     onClose();
   };
 
@@ -59,33 +58,45 @@ export function ChangePasswordModal({
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div>
-            <Label htmlFor="password" className="text-gray-300">
-              Nova Senha
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="bg-[#0a1929]/80 border-white/10 text-white mt-2"
-              placeholder="••••••••"
-              required
-            />
+            <Label className="text-gray-300">Nova Senha</Label>
+            <div className="relative mt-2">
+              <Input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-[#0a1929]/80 border-white/10 text-white pr-10"
+                placeholder="••••••••"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           <div>
-            <Label htmlFor="confirmPassword" className="text-gray-300">
-              Confirmar Senha
-            </Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="bg-[#0a1929]/80 border-white/10 text-white mt-2"
-              placeholder="••••••••"
-              required
-            />
+            <Label className="text-gray-300">Confirmar Senha</Label>
+            <div className="relative mt-2">
+              <Input
+                type={showConfirm ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="bg-[#0a1929]/80 border-white/10 text-white pr-10"
+                placeholder="••••••••"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm(!showConfirm)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+              >
+                {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           {error && (
@@ -95,18 +106,10 @@ export function ChangePasswordModal({
           )}
 
           <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="flex-1 border-white/10 hover:bg-white/5"
-            >
+            <Button type="button" variant="outline" onClick={onClose} className="flex-1 border-white/10 hover:bg-white/5">
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white"
-            >
+            <Button type="submit" className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white">
               Atualizar Senha
             </Button>
           </div>

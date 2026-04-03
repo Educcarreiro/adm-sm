@@ -13,8 +13,11 @@ import { ChangePasswordModal } from "../components/ChangePasswordModal";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Mail, User, Shield, Plus, Key, XCircle } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 export function Users() {
+  const { user: currentUser } = useAuth();
+  const isAdmin = currentUser?.role === "Administrador";
   const [users, setUsers] = useState<InternalUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddUserModal, setShowAddUserModal] = useState(false);
@@ -104,13 +107,15 @@ export function Users() {
             <h1 className="text-3xl font-bold text-white mb-2">Usuários Internos</h1>
             <p className="text-gray-400">Gerenciar equipe Soccer Mind</p>
           </div>
-          <Button
-            onClick={() => setShowAddUserModal(true)}
-            className="bg-cyan-500 hover:bg-cyan-600 text-white"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Adicionar usuário interno
-          </Button>
+          {isAdmin && (
+            <Button
+              onClick={() => setShowAddUserModal(true)}
+              className="bg-cyan-500 hover:bg-cyan-600 text-white"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Adicionar usuário interno
+            </Button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
