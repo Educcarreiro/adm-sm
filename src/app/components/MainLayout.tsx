@@ -58,65 +58,69 @@ export function MainLayout({ children }: MainLayoutProps) {
         <div
           style={{
             borderBottom: "1px solid rgba(255,255,255,0.05)",
-            padding: collapsed ? "20px 0 16px" : "20px 16px 16px",
+            padding: collapsed ? "18px 0 14px" : "22px 18px 18px",
             transition: "padding 260ms cubic-bezier(0.4,0,0.2,1)",
             position: "relative",
           }}
         >
           {collapsed ? (
-            /* Collapsed: just logo centered */
-            <div className="flex flex-col items-center gap-2">
-              <img src={logoSrc} alt="SM" style={{ height: "30px", width: "30px", objectFit: "contain" }} />
+            /* Collapsed */
+            <div className="flex flex-col items-center gap-3">
+              <img src={logoSrc} alt="SM" style={{ height: "32px", width: "32px", objectFit: "contain" }} />
               <button
                 onClick={() => setCollapsed(false)}
                 className="flex items-center justify-center rounded-lg transition-all duration-150"
                 style={{
-                  width: "30px", height: "30px",
-                  background: "rgba(255,255,255,0.03)",
+                  width: "28px", height: "28px",
+                  background: "transparent",
                   border: "1px solid rgba(255,255,255,0.07)",
-                  color: "#334155",
+                  color: "#2d4a5f",
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#94a3b8"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.14)"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#334155"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)"; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#64748b"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.12)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#2d4a5f"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)"; }}
               >
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
           ) : (
-            /* Expanded: logo + brand text + collapse btn */
-            <div className="flex items-start justify-between">
-              <div className="flex flex-col">
-                <img src={logoSrc} alt="Soccer Mind" style={{ height: "48px", width: "auto", marginBottom: "10px" }} />
-                <div>
-                  <p
-                    className="text-xs font-bold tracking-widest uppercase"
-                    style={{ color: "#22d3ee", letterSpacing: "0.12em", lineHeight: 1 }}
-                  >
-                    Admin
-                  </p>
-                  <p
-                    className="text-xs font-semibold tracking-wider"
-                    style={{ color: "#334155", letterSpacing: "0.06em", marginTop: "2px" }}
-                  >
-                    Control Center
-                  </p>
-                </div>
+            /* Expanded */
+            <div>
+              {/* Top row: logo + collapse button */}
+              <div className="flex items-start justify-between mb-3">
+                <img src={logoSrc} alt="Soccer Mind" style={{ height: "44px", width: "auto" }} />
+                <button
+                  onClick={() => setCollapsed(true)}
+                  className="flex items-center justify-center rounded-lg transition-all duration-150"
+                  style={{
+                    width: "26px", height: "26px",
+                    background: "transparent",
+                    border: "1px solid rgba(255,255,255,0.07)",
+                    color: "#2d4a5f",
+                    flexShrink: 0,
+                    marginTop: "2px",
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#64748b"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.12)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#2d4a5f"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)"; }}
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
               </div>
-              <button
-                onClick={() => setCollapsed(true)}
-                className="flex items-center justify-center rounded-lg transition-all duration-150 mt-1"
-                style={{
-                  width: "28px", height: "28px",
-                  background: "rgba(255,255,255,0.02)",
-                  border: "1px solid rgba(255,255,255,0.07)",
-                  color: "#334155",
-                  flexShrink: 0,
-                }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#94a3b8"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.14)"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#334155"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)"; }}
-              >
-                <ChevronLeft className="w-3.5 h-3.5" />
-              </button>
+
+              {/* Brand text */}
+              <div>
+                <p
+                  className="text-sm font-semibold"
+                  style={{ color: "#cbd5e1", letterSpacing: "-0.01em", lineHeight: 1.2 }}
+                >
+                  Soccer Mind
+                </p>
+                <p
+                  className="text-xs"
+                  style={{ color: "#334155", marginTop: "3px", letterSpacing: "0.01em" }}
+                >
+                  Admin Console
+                </p>
+              </div>
             </div>
           )}
         </div>
