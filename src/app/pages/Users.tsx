@@ -7,6 +7,7 @@ import {
   updateUserPassword,
   type InternalUser,
 } from "../../lib/usersService";
+import { sendWelcomeEmail } from "../../lib/emailService";
 import { AddUserModal } from "../components/AddUserModal";
 import { ChangePasswordModal } from "../components/ChangePasswordModal";
 import { Badge } from "../components/ui/badge";
@@ -59,6 +60,12 @@ export function Users() {
         email: userData.email,
         role: userData.role,
         permissions: getRolePermissions(userData.role),
+        password: userData.password,
+      });
+      await sendWelcomeEmail({
+        name: userData.name,
+        email: userData.email,
+        role: userData.role,
         password: userData.password,
       });
       await loadUsers();
