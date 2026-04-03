@@ -23,15 +23,17 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   const w = collapsed ? COLLAPSED : EXPANDED;
 
+  const isAdmin = user?.role === "Administrador";
+
   const menuItems = [
-    { path: "/dashboard",    icon: LayoutDashboard, label: "Dashboard" },
-    { path: "/clients",      icon: Users,           label: "Clientes" },
-    { path: "/service-desk", icon: Ticket,          label: "Service Desk" },
-    { path: "/upsells",      icon: Package,         label: "Upsells" },
-    { path: "/pricing",      icon: DollarSign,      label: "Preços" },
-    { path: "/contracts",    icon: FileText,        label: "Contratos" },
-    { path: "/users",        icon: UserCog,         label: "Usuários" },
-  ];
+    { path: "/dashboard",    icon: LayoutDashboard, label: "Dashboard",    adminOnly: false },
+    { path: "/clients",      icon: Users,           label: "Clientes",     adminOnly: false },
+    { path: "/service-desk", icon: Ticket,          label: "Service Desk", adminOnly: false },
+    { path: "/upsells",      icon: Package,         label: "Upsells",      adminOnly: true  },
+    { path: "/pricing",      icon: DollarSign,      label: "Preços",       adminOnly: true  },
+    { path: "/contracts",    icon: FileText,        label: "Contratos",    adminOnly: true  },
+    { path: "/users",        icon: UserCog,         label: "Usuários",     adminOnly: false },
+  ].filter((item) => !item.adminOnly || isAdmin);
 
   return (
     <div

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { Navigate } from "react-router";
 import { MainLayout } from "../components/MainLayout";
+import { useAuth } from "../contexts/AuthContext";
 import { fetchContracts, addContract, deleteContract, type Contract } from "../../lib/contractsService";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -25,6 +27,7 @@ const emptyForm = {
 };
 
 export function Contracts() {
+  const { user } = useAuth();
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -43,6 +46,8 @@ export function Contracts() {
   };
 
   useEffect(() => { loadContracts(); }, []);
+
+  if (user?.role !== "Administrador") return <Navigate to="/dashboard" replace />;
 
   const handleAdd = async () => {
     if (!form.club_name || !form.plan || !form.monthly_value || !form.start_date || !form.end_date) return;

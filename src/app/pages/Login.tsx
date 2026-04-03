@@ -154,14 +154,14 @@ export function Login() {
               }}
             >
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold tracking-tight text-white mb-2">Bem-vindo</h2>
-                <p className="text-sm" style={{ color: "#64748b" }}>Acesse sua conta para continuar</p>
+                <h2 className="text-3xl font-bold tracking-tight text-white mb-2">{t("login.welcome")}</h2>
+                <p className="text-sm" style={{ color: "#64748b" }}>{t("login.welcomeSubtitle")}</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Email */}
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: "#94a3b8" }}>Email</label>
+                  <label className="block text-sm font-medium mb-2" style={{ color: "#94a3b8" }}>{t("login.email")}</label>
                   <div className="relative group/input">
                     <Mail
                       className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200"
@@ -169,7 +169,7 @@ export function Login() {
                     />
                     <input
                       type="email"
-                      placeholder="seu@email.com"
+                      placeholder={t("login.emailPlaceholder")}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -198,7 +198,7 @@ export function Login() {
 
                 {/* Password */}
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: "#94a3b8" }}>Senha</label>
+                  <label className="block text-sm font-medium mb-2" style={{ color: "#94a3b8" }}>{t("login.password")}</label>
                   <div className="relative">
                     <Lock
                       className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200"
@@ -206,7 +206,7 @@ export function Login() {
                     />
                     <input
                       type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
+                      placeholder={t("login.passwordPlaceholder")}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -256,7 +256,7 @@ export function Login() {
                       style={{ accentColor: "#06b6d4" }}
                     />
                     <label htmlFor="remember" className="text-sm cursor-pointer" style={{ color: "#475569" }}>
-                      Lembrar-me
+                      {t("login.rememberMe")}
                     </label>
                   </div>
                   <a
@@ -266,7 +266,7 @@ export function Login() {
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#67e8f9"; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#06b6d4"; }}
                   >
-                    Esqueceu a senha?
+                    {t("login.forgotPassword")}
                   </a>
                 </div>
 
@@ -306,7 +306,7 @@ export function Login() {
                       />
                     )}
                     <span className="relative z-10">
-                      {isLoading ? "Entrando..." : "Entrar no Painel"}
+                      {isLoading ? t("login.loading") : t("login.button")}
                     </span>
                   </button>
                 </div>
@@ -314,7 +314,7 @@ export function Login() {
 
               <div className="mt-8 pt-6" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
                 <p className="text-xs text-center" style={{ color: "#1e293b" }}>
-                  Sistema interno Soccer Mind • Uso exclusivo da equipe
+                  {t("login.footer")}
                 </p>
               </div>
             </div>

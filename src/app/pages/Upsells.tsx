@@ -1,7 +1,9 @@
+import { Navigate } from "react-router";
 import { MainLayout } from "../components/MainLayout";
+import { useAuth } from "../contexts/AuthContext";
 import { mockUpsells } from "../data/mockData";
 import { Badge } from "../components/ui/badge";
-import { Users, DollarSign, Package, Shield, Target, TrendingUp, Activity, BarChart3, FileText } from "lucide-react";
+import { Users, DollarSign, Package, Shield, Target, TrendingUp, Activity, BarChart3, FileText, Pencil } from "lucide-react";
 import { useState } from "react";
 import {
   Dialog,
@@ -134,7 +136,16 @@ const upsellDetails: { [key: string]: UpsellDetail } = {
 };
 
 export function Upsells() {
+  const { user } = useAuth();
   const [selectedUpsell, setSelectedUpsell] = useState<UpsellDetail | null>(null);
+  const [upsellPrices, setUpsellPrices] = useState<Record<string, number>>(
+    Object.fromEntries(mockUpsells.map((u) => [u.id, u.price]))
+  );
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState("");
+
+  const isAdmin = user?.role === "Administrador";
+  if (!isAdmin) return <Navigate to="/dashboard" replace />;
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -200,7 +211,42 @@ export function Upsells() {
               <div className="space-y-3 mb-6">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-500">Preço Mensal</span>
-                  <span className="text-lg font-bold text-white">€{upsell.price}</span>
+                  {editingId === upsell.id ? (
+                    <div className="flex items-center gap-1">
+                      <span className="text-white font-bold">€</span>
+                      <input
+                        type="number"
+                        className="w-24 bg-[#0a1628] border border-cyan-500/40 rounded-lg px-2 py-0.5 text-white text-sm outline-none"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            const val = parseInt(editValue);
+                            if (!isNaN(val) && val > 0) setUpsellPrices((p) => ({ ...p, [upsell.id]: val }));
+                            setEditingId(null);
+                          } else if (e.key === "Escape") {
+                            setEditingId(null);
+                          }
+                        }}
+                        onBlur={() => {
+                          const val = parseInt(editValue);
+                          if (!isNaN(val) && val > 0) setUpsellPrices((p) => ({ ...p, [upsell.id]: val }));
+                          setEditingId(null);
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <span className="text-lg font-bold text-white">€{upsellPrices[upsell.id]}</span>
+                      <button
+                        onClick={() => { setEditingId(upsell.id); setEditValue(String(upsellPrices[upsell.id])); }}
+                        className="text-gray-600 hover:text-cyan-400 transition-colors ml-1"
+                      >
+                        <Pencil className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-500">Clientes Ativos</span>
@@ -212,7 +258,7 @@ export function Upsells() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-500">Receita Mensal</span>
                   <span className="font-semibold text-green-400">
-                    €{(upsell.price * upsell.activeClients).toLocaleString()}
+                    €{(upsellPrices[upsell.id] * upsell.activeClients).toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -297,7 +343,7 @@ export function Upsells() {
                         <span className="text-sm text-gray-400">Preço Mensal</span>
                       </div>
                       <p className="text-2xl font-bold text-white">
-                        €{mockUpsells.find((u) => u.name === selectedUpsell.name)?.price}
+                        €{upsellPrices[mockUpsells.find((u) => u.name === selectedUpsell.name)?.id ?? "1"]}
                       </p>
                     </div>
                     <div className="bg-[#0a1628]/50 rounded-xl p-4 border border-white/10">

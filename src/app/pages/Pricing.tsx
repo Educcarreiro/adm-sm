@@ -1,14 +1,19 @@
+import { Navigate } from "react-router";
 import { MainLayout } from "../components/MainLayout";
-import { DollarSign, TrendingUp, ChevronDown, ChevronUp, Shield, Zap, Target, AlertCircle, Eye, Activity, TrendingDown, Lock, FileText, BarChart3 } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { DollarSign, TrendingUp, ChevronDown, ChevronUp, Shield, Zap, Target, AlertCircle, Eye, Activity, TrendingDown, FileText, BarChart3, Pencil, Check, X, Building2 } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { useState } from "react";
 
 export function Pricing() {
+  const { user } = useAuth();
   const [serieAOpen, setSerieAOpen] = useState(true);
   const [serieBOpen, setSerieBOpen] = useState(true);
   const [diferenciaisOpen, setDiferenciaisOpen] = useState(false);
-
-  const serieAPlans = [
+  const [aplicacaoOpen, setAplicacaoOpen] = useState(true);
+  const [editingPrice, setEditingPrice] = useState<{ index: number; serie: "A" | "B" | "aplicacao" } | null>(null);
+  const [editValue, setEditValue] = useState("");
+  const [serieAPlans, setSerieAPlans] = useState([
     {
       tier: "Primeira Prateleira",
       subtitle: "Top Clubs",
@@ -49,9 +54,8 @@ export function Pricing() {
       badge: "Standard",
       badgeColor: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
     },
-  ];
-
-  const serieBPlans = [
+  ]);
+  const [serieBPlans, setSerieBPlans] = useState([
     {
       tier: "Primeira Prateleira",
       subtitle: "Série B",
@@ -89,7 +93,26 @@ export function Pricing() {
       badge: "Essential",
       badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20",
     },
-  ];
+  ]);
+  const [aplicacaoPrice, setAplicacaoPrice] = useState("R$ 300.000");
+
+  if (user?.role !== "Administrador") return <Navigate to="/dashboard" replace />;
+
+  const savePrice = (serie: "A" | "B" | "aplicacao", index: number) => {
+    if (serie === "A") {
+      setSerieAPlans((prev) => prev.map((p, i) => i === index ? { ...p, price: editValue } : p));
+    } else if (serie === "B") {
+      setSerieBPlans((prev) => prev.map((p, i) => i === index ? { ...p, price: editValue } : p));
+    } else {
+      setAplicacaoPrice(editValue);
+    }
+    setEditingPrice(null);
+  };
+
+  const startEdit = (serie: "A" | "B" | "aplicacao", index: number, currentPrice: string) => {
+    setEditingPrice({ index, serie });
+    setEditValue(currentPrice);
+  };
 
   const diferenciais = [
     {
@@ -264,7 +287,23 @@ export function Pricing() {
                   </div>
 
                   <div className="mb-6 pb-6 border-b border-white/10">
-                    <div className="text-2xl font-bold text-white">{plan.price}</div>
+                    {editingPrice?.serie === "A" && editingPrice?.index === index ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          className="flex-1 bg-[#0a1628] border border-cyan-500/40 rounded-lg px-3 py-1.5 text-white text-sm outline-none"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          autoFocus
+                        />
+                        <button onClick={() => savePrice("A", index)} className="text-green-400 hover:text-green-300"><Check className="w-4 h-4" /></button>
+                        <button onClick={() => setEditingPrice(null)} className="text-red-400 hover:text-red-300"><X className="w-4 h-4" /></button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <div className="text-2xl font-bold text-white">{plan.price}</div>
+                        <button onClick={() => startEdit("A", index, plan.price)} className="text-gray-500 hover:text-cyan-400 transition-colors ml-1"><Pencil className="w-3.5 h-3.5" /></button>
+                      </div>
+                    )}
                     <div className="text-sm text-gray-400">{plan.period}</div>
                   </div>
 
@@ -315,7 +354,23 @@ export function Pricing() {
                   </div>
 
                   <div className="mb-6 pb-6 border-b border-white/10">
-                    <div className="text-2xl font-bold text-white">{plan.price}</div>
+                    {editingPrice?.serie === "B" && editingPrice?.index === index ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          className="flex-1 bg-[#0a1628] border border-purple-500/40 rounded-lg px-3 py-1.5 text-white text-sm outline-none"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          autoFocus
+                        />
+                        <button onClick={() => savePrice("B", index)} className="text-green-400 hover:text-green-300"><Check className="w-4 h-4" /></button>
+                        <button onClick={() => setEditingPrice(null)} className="text-red-400 hover:text-red-300"><X className="w-4 h-4" /></button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <div className="text-2xl font-bold text-white">{plan.price}</div>
+                        <button onClick={() => startEdit("B", index, plan.price)} className="text-gray-500 hover:text-purple-400 transition-colors ml-1"><Pencil className="w-3.5 h-3.5" /></button>
+                      </div>
+                    )}
                     <div className="text-sm text-gray-400">{plan.period}</div>
                   </div>
 
@@ -329,6 +384,75 @@ export function Pricing() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+
+        {/* Aplicação Section - Admin only */}
+        <div className="mb-6">
+          <button
+            onClick={() => setAplicacaoOpen(!aplicacaoOpen)}
+            className="w-full bg-[#0f1c2e]/50 backdrop-blur-xl border border-yellow-500/20 rounded-xl p-4 hover:border-yellow-500/40 transition-all flex items-center justify-between"
+          >
+            <div className="flex items-center gap-3">
+              <Building2 className="w-5 h-5 text-yellow-400" />
+              <h2 className="text-2xl font-bold text-white">Aplicação</h2>
+              <Badge className="bg-yellow-500/10 text-yellow-400 border-yellow-500/20 text-xs">Taxa Única</Badge>
+            </div>
+            {aplicacaoOpen ? (
+              <ChevronUp className="w-5 h-5 text-gray-400" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-gray-400" />
+            )}
+          </button>
+
+          {aplicacaoOpen && (
+            <div className="mt-6">
+              <div className="bg-[#0f1c2e]/50 backdrop-blur-xl border border-yellow-500/20 rounded-xl p-6 hover:border-yellow-500/30 transition-all max-w-md">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Taxa de Implementação</h3>
+                    <p className="text-sm text-gray-400">Cobrada uma única vez</p>
+                  </div>
+                  <Badge className="bg-yellow-500/10 text-yellow-400 border-yellow-500/20">Implementação</Badge>
+                </div>
+
+                <div className="mb-6 pb-6 border-b border-white/10">
+                  {editingPrice?.serie === "aplicacao" ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        className="flex-1 bg-[#0a1628] border border-yellow-500/40 rounded-lg px-3 py-1.5 text-white text-sm outline-none"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        autoFocus
+                      />
+                      <button onClick={() => savePrice("aplicacao", 0)} className="text-green-400 hover:text-green-300"><Check className="w-4 h-4" /></button>
+                      <button onClick={() => setEditingPrice(null)} className="text-red-400 hover:text-red-300"><X className="w-4 h-4" /></button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <div className="text-3xl font-bold text-yellow-400">{aplicacaoPrice}</div>
+                      <button onClick={() => startEdit("aplicacao", 0, aplicacaoPrice)} className="text-gray-500 hover:text-yellow-400 transition-colors ml-1"><Pencil className="w-3.5 h-3.5" /></button>
+                    </div>
+                  )}
+                  <div className="text-sm text-gray-400 mt-1">taxa única de implementação</div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-yellow-400 mt-2 flex-shrink-0" />
+                    <span className="text-sm text-gray-300">Valor cobrado pela implementação da nossa plataforma no clube</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-yellow-400 mt-2 flex-shrink-0" />
+                    <span className="text-sm text-gray-300">Inclui configuração, integração e onboarding da equipe</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-yellow-400 mt-2 flex-shrink-0" />
+                    <span className="text-sm text-gray-300">Cobrado separadamente da assinatura mensal</span>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
