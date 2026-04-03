@@ -101,7 +101,7 @@ export function Login() {
           <img
             src={logoSrc}
             alt="Soccer Mind"
-            className="h-12 w-auto relative"
+            className="h-16 w-auto relative"
             style={{ filter: "drop-shadow(0 0 15px rgba(6,182,212,0.3))" }}
           />
         </div>
@@ -115,7 +115,7 @@ export function Login() {
           {/* Title */}
           <div className="text-center mb-8">
             <h1
-              className="text-2xl font-semibold tracking-tight mb-1"
+              className="text-3xl font-bold tracking-tight mb-1"
               style={{
                 background: "linear-gradient(to right, #ffffff, #a5f3fc, #ffffff)",
                 WebkitBackgroundClip: "text",
@@ -123,7 +123,7 @@ export function Login() {
                 backgroundClip: "text",
               }}
             >
-              Soccer Mind Control
+              Soccer Mind Command Center
             </h1>
             <p className="text-sm font-medium" style={{ color: "#22d3ee" }}>
               Menos achismo. Mais decisão consciente.
