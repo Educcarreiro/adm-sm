@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
+import { supabase } from "../../lib/supabase";
 
 interface User {
   email: string;
@@ -19,57 +20,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Credenciais de admin
-    if (email === "soccermind@adm.com.br" && password === "Senha123") {
-      setUser({
-        email: email,
-        name: "Administrador",
-        role: "Admin",
-      });
-      return true;
-    }
-    
-    // Credencial Johnny Silva
-    if (email === "johnny@soccermind.com.br" && password === "JS2026SM") {
-      setUser({
-        email: email,
-        name: "Johnny Silva",
-        role: "Administrador",
-      });
-      return true;
-    }
-    
-    // Credencial Eduarda Carreiro
-    if (email === "eduarda@soccermind.com.br" && password === "Senha2805") {
-      setUser({
-        email: email,
-        name: "Eduarda Carreiro",
-        role: "Administrador",
-      });
-      return true;
-    }
-    
-    // Credencial Lais Cardoso
-    if (email === "lais@soccermind.com.br" && password === "Senha123") {
-      setUser({
-        email: email,
-        name: "Lais Cardoso",
-        role: "Desenvolvedor Sênior",
-      });
-      return true;
-    }
-    
-    // Credencial Guilherme Santana
-    if (email === "guilherme@soccermind.com.br" && password === "laila2026") {
-      setUser({
-        email: email,
-        name: "Guilherme Santana",
-        role: "PMO",
-      });
-      return true;
-    }
-    
-    return false;
+    const { data, error } = await supabase
+      .from("internal_users")
+      .select("name, email, role, password")
+      .eq("email", email)
+      .single();
+
+    if (error || !data) return false;
+    if (data.password !== password) return false;
+
+    setUser({ email: data.email, name: data.name, role: data.role });
+    return true;
   };
 
   const logout = () => {
@@ -77,14 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        login,
-        logout,
-        isAuthenticated: !!user,
-      }}
-    >
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );
