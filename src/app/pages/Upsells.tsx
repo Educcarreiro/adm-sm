@@ -163,33 +163,13 @@ export function Upsells() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-8">
           <div className="bg-[#0f1c2e]/50 backdrop-blur-xl border border-white/10 rounded-xl p-6">
             <div className="flex items-center gap-3 mb-2">
               <Package className="w-5 h-5 text-cyan-400" />
               <p className="text-sm text-gray-400">Total de Módulos</p>
             </div>
             <p className="text-3xl font-bold text-white">{mockUpsells.length}</p>
-          </div>
-
-          <div className="bg-[#0f1c2e]/50 backdrop-blur-xl border border-white/10 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <Users className="w-5 h-5 text-green-400" />
-              <p className="text-sm text-gray-400">Total de Ativações</p>
-            </div>
-            <p className="text-3xl font-bold text-white">
-              {mockUpsells.reduce((sum, u) => sum + u.activeClients, 0)}
-            </p>
-          </div>
-
-          <div className="bg-[#0f1c2e]/50 backdrop-blur-xl border border-white/10 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <DollarSign className="w-5 h-5 text-purple-400" />
-              <p className="text-sm text-gray-400">Receita de Upsells</p>
-            </div>
-            <p className="text-3xl font-bold text-white">
-              €{mockUpsells.reduce((sum, u) => sum + u.price * u.activeClients, 0).toLocaleString()}
-            </p>
           </div>
         </div>
 

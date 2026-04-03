@@ -6,6 +6,7 @@ import { useLanguage } from "../contexts/LanguageContext";
 import { LanguageSelector } from "../components/LanguageSelector";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
+import logoSrc from "../../assets/soccer_mind_sem_background.png";
 import { Checkbox } from "../components/ui/checkbox";
 
 export function Login() {
@@ -43,7 +44,7 @@ export function Login() {
       {/* Header */}
       <header className="w-full p-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <img src="/src/assets/soccer_mind_sem_background.png" alt="Soccer Mind" className="h-24 w-auto" />
+          <img src={logoSrc} alt="Soccer Mind" className="h-24 w-auto" />
         </div>
         <LanguageSelector />
       </header>

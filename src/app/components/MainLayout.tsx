@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import logoSrc from "../../assets/soccer_mind_sem_background.png";
 import { useLocation, useNavigate } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 import {
@@ -43,7 +44,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         {/* Logo */}
         <div className="p-6 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <img src="/src/assets/soccer_mind_sem_background.png" alt="Soccer Mind" className="h-20 w-auto" />
+            <img src={logoSrc} alt="Soccer Mind" className="h-20 w-auto" />
           </div>
           <p className="text-xs text-gray-500 mt-2">Painel Administrativo</p>
         </div>
