@@ -1,7 +1,5 @@
 import { MainLayout } from "../components/MainLayout";
-import { mockUpsells } from "../data/mockData";
-import { Badge } from "../components/ui/badge";
-import { Users, DollarSign, Package, Shield, Target, Zap, AlertCircle, Eye, TrendingDown, TrendingUp, Activity, BarChart3, FileText } from "lucide-react";
+import { Package, Target, TrendingUp, Shield, Activity, FileText, BarChart3 } from "lucide-react";
 import { useState } from "react";
 import {
   Dialog,
@@ -20,9 +18,9 @@ interface UpsellDetail {
   benefits: string[];
 }
 
-const upsellDetails: { [key: string]: UpsellDetail } = {
-  "Fit Tático": {
-    name: "Fit Tático (DNA do Clube)",
+const upsellDetails: UpsellDetail[] = [
+  {
+    name: "Fit Tático",
     description: "Análise de compatibilidade tática jogador × sistema",
     fullDescription: "Modelagem do estilo de jogo do clube e compatibilidade real entre jogador e sistema tático",
     icon: Target,
@@ -39,7 +37,7 @@ const upsellDetails: { [key: string]: UpsellDetail } = {
       "Permite planejamento de cenários futuros",
     ],
   },
-  "Ranking de Jogadores": {
+  {
     name: "Ranking de Jogadores",
     description: "Sistema de classificação baseado em performance e potencial",
     fullDescription: "Sistema avançado de classificação de atletas com base em múltiplos indicadores de performance",
@@ -57,7 +55,7 @@ const upsellDetails: { [key: string]: UpsellDetail } = {
       "Base sólida para negociações",
     ],
   },
-  "Player vs Player": {
+  {
     name: "Player vs Player",
     description: "Comparação direta entre atletas da mesma posição",
     fullDescription: "Ferramenta de comparação detalhada entre jogadores para decisões de contratação e substituição",
@@ -75,8 +73,8 @@ const upsellDetails: { [key: string]: UpsellDetail } = {
       "Otimização de investimento",
     ],
   },
-  "Health Analytics": {
-    name: "Health Analytics (Módulo Físico / Prevenção)",
+  {
+    name: "Health Analytics",
     description: "Análise de histórico de lesões e prevenção",
     fullDescription: "Sistema de prevenção e análise de risco físico para proteção do investimento em atletas",
     icon: Activity,
@@ -93,7 +91,7 @@ const upsellDetails: { [key: string]: UpsellDetail } = {
       "Maximização de disponibilidade do elenco",
     ],
   },
-  "Relatório Executivo": {
+  {
     name: "Relatório Executivo",
     description: "Documentação consolidada para diretoria",
     fullDescription: "Relatórios completos e profissionais para apresentação à diretoria e conselho",
@@ -111,8 +109,8 @@ const upsellDetails: { [key: string]: UpsellDetail } = {
       "Credibilidade institucional",
     ],
   },
-  "Análises": {
-    name: "Análises Avançadas",
+  {
+    name: "Análises",
     description: "Ferramentas analíticas completas da plataforma",
     fullDescription: "Suite completa de análises para decisões estratégicas em múltiplas frentes",
     icon: BarChart3,
@@ -131,199 +129,112 @@ const upsellDetails: { [key: string]: UpsellDetail } = {
       "Vantagem competitiva sobre adversários",
     ],
   },
+];
+
+const cardStyle = {
+  background: "rgba(255,255,255,0.02)",
+  border: "1px solid rgba(255,255,255,0.05)",
+  borderRadius: "16px",
+  padding: "24px",
 };
 
 export function Upsells() {
   const [selectedUpsell, setSelectedUpsell] = useState<UpsellDetail | null>(null);
 
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case "Analytics":
-        return "bg-cyan-500/10 text-cyan-400 border-cyan-500/20";
-      case "Medical":
-        return "bg-red-500/10 text-red-400 border-red-500/20";
-      case "Tactics":
-        return "bg-purple-500/10 text-purple-400 border-purple-500/20";
-      case "Transfers":
-        return "bg-green-500/10 text-green-400 border-green-500/20";
-      case "Reports":
-        return "bg-yellow-500/10 text-yellow-400 border-yellow-500/20";
-      default:
-        return "bg-gray-500/10 text-gray-400 border-gray-500/20";
-    }
-  };
-
   return (
     <MainLayout>
-      <div className="p-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Upsells</h1>
-          <p className="text-gray-400">Gerenciar todos os módulos disponíveis na plataforma</p>
+      <div className="p-8 max-w-7xl mx-auto">
+
+        <div className="mb-12">
+          <h1 className="text-2xl font-semibold tracking-tight text-white mb-1">Upsells</h1>
+          <p className="text-sm" style={{ color: "#475569" }}>Módulos disponíveis na plataforma Soccer Mind</p>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-8">
-          <div className="bg-[#0f1c2e]/50 backdrop-blur-xl border border-white/10 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <Package className="w-5 h-5 text-cyan-400" />
-              <p className="text-sm text-gray-400">Total de Módulos</p>
+        <div className="mb-12">
+          <div style={{ ...cardStyle, display: "inline-flex", alignItems: "center", gap: "16px", padding: "20px 28px" }}>
+            <Package className="w-5 h-5" style={{ color: "#334155" }} />
+            <div>
+              <p className="text-2xl font-semibold tracking-tight text-white">{upsellDetails.length}</p>
+              <p className="text-xs" style={{ color: "#475569" }}>Total de Módulos</p>
             </div>
-            <p className="text-3xl font-bold text-white">{mockUpsells.length}</p>
           </div>
         </div>
 
-        {/* Upsells Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockUpsells.map((upsell) => (
-            <div
-              key={upsell.id}
-              className="bg-[#0f1c2e]/50 backdrop-blur-xl border border-white/10 rounded-xl p-6 hover:border-cyan-500/30 transition-all"
-            >
-              {/* Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="w-12 h-12 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-                  <Package className="w-6 h-6 text-cyan-400" />
-                </div>
-                <Badge className={getCategoryColor(upsell.category)}>
-                  {upsell.category}
-                </Badge>
-              </div>
-
-              {/* Title */}
-              <h3 className="text-xl font-bold text-white mb-2">{upsell.name}</h3>
-
-              {/* Description */}
-              <p className="text-sm text-gray-400 mb-6">{upsell.description}</p>
-
-              {/* Stats */}
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Preço Mensal</span>
-                  <span className="text-lg font-bold text-white">€{upsell.price}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Clientes Ativos</span>
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-cyan-400" />
-                    <span className="font-semibold text-white">{upsell.activeClients}</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Receita Mensal</span>
-                  <span className="font-semibold text-green-400">
-                    €{(upsell.price * upsell.activeClients).toLocaleString()}
-                  </span>
-                </div>
-              </div>
-
-              {/* Progress bar */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-500">Adoção</span>
-                  <span className="text-gray-400">
-                    {Math.round((upsell.activeClients / 24) * 100)}%
-                  </span>
-                </div>
-                <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-cyan-500 to-cyan-600 rounded-full"
-                    style={{ width: `${(upsell.activeClients / 24) * 100}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Detail Button */}
-              <button
-                className="mt-4 w-full px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg text-sm font-semibold transition-colors"
-                onClick={() => setSelectedUpsell(upsellDetails[upsell.name])}
+        {/* Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {upsellDetails.map((upsell) => {
+            const Icon = upsell.icon;
+            return (
+              <div
+                key={upsell.name}
+                style={cardStyle}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.border = "1px solid rgba(255,255,255,0.1)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.border = "1px solid rgba(255,255,255,0.05)"; }}
+                className="transition-all duration-200"
               >
-                Ver Detalhes do Módulo
-              </button>
-            </div>
-          ))}
+                <div className="mb-5">
+                  <Icon className="w-5 h-5" style={{ color: "#334155" }} />
+                </div>
+
+                <h3 className="text-base font-semibold text-white mb-2">{upsell.name}</h3>
+                <p className="text-sm mb-6" style={{ color: "#475569" }}>{upsell.description}</p>
+
+                <button
+                  onClick={() => setSelectedUpsell(upsell)}
+                  className="text-xs font-medium transition-colors duration-150"
+                  style={{ color: "#334155" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#94a3b8"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#334155"; }}
+                >
+                  Ver detalhes →
+                </button>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Upsell Detail Dialog */}
+        {/* Detail Dialog */}
         <Dialog open={!!selectedUpsell} onOpenChange={() => setSelectedUpsell(null)}>
-          <DialogContent className="bg-[#0f1c2e] border-white/10 text-white max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogContent style={{ background: "#080f1e", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "20px", color: "white", maxWidth: "640px" }} className="max-h-[90vh] overflow-y-auto">
             {selectedUpsell && (
               <>
                 <DialogHeader>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-12 h-12 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-                      <selectedUpsell.icon className="w-6 h-6 text-cyan-400" />
+                  <div className="flex items-center gap-3 mb-1">
+                    <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "10px", padding: "10px" }}>
+                      <selectedUpsell.icon className="w-5 h-5" style={{ color: "#475569" }} />
                     </div>
                     <div>
-                      <DialogTitle className="text-2xl font-bold text-white">
-                        {selectedUpsell.name}
-                      </DialogTitle>
-                      <DialogDescription className="text-sm text-gray-400">
-                        {selectedUpsell.description}
-                      </DialogDescription>
+                      <DialogTitle className="text-lg font-semibold text-white">{selectedUpsell.name}</DialogTitle>
+                      <DialogDescription className="text-sm" style={{ color: "#475569" }}>{selectedUpsell.description}</DialogDescription>
                     </div>
                   </div>
                 </DialogHeader>
 
-                <div className="space-y-6 mt-6">
-                  {/* Full Description */}
-                  <div className="bg-[#0a1628]/50 rounded-xl p-4 border border-cyan-500/20">
-                    <p className="text-gray-300 text-sm leading-relaxed">
-                      {selectedUpsell.fullDescription}
-                    </p>
-                  </div>
+                <div className="space-y-6 mt-4">
+                  <p className="text-sm leading-relaxed" style={{ color: "#64748b" }}>{selectedUpsell.fullDescription}</p>
 
-                  {/* Features */}
                   <div>
-                    <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-                      <Package className="w-5 h-5 text-cyan-400" />
-                      Funcionalidades
-                    </h3>
+                    <p className="text-xs font-medium uppercase tracking-widest mb-3" style={{ color: "#334155" }}>Funcionalidades</p>
                     <div className="space-y-2">
                       {selectedUpsell.features.map((feature, idx) => (
-                        <div key={idx} className="flex items-start gap-3 bg-[#0a1628]/30 rounded-lg p-3">
-                          <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-2 flex-shrink-0" />
-                          <span className="text-sm text-gray-300">{feature}</span>
+                        <div key={idx} className="flex items-start gap-3 p-3 rounded-xl" style={{ background: "rgba(255,255,255,0.02)" }}>
+                          <div className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" style={{ background: "#334155" }} />
+                          <span className="text-sm" style={{ color: "#94a3b8" }}>{feature}</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Benefits */}
                   <div>
-                    <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-green-400" />
-                      Benefícios Estratégicos
-                    </h3>
+                    <p className="text-xs font-medium uppercase tracking-widest mb-3" style={{ color: "#334155" }}>Benefícios Estratégicos</p>
                     <div className="space-y-2">
                       {selectedUpsell.benefits.map((benefit, idx) => (
-                        <div key={idx} className="flex items-start gap-3 bg-[#0a1628]/30 rounded-lg p-3">
-                          <div className="w-1.5 h-1.5 rounded-full bg-green-400 mt-2 flex-shrink-0" />
-                          <span className="text-sm text-gray-300">{benefit}</span>
+                        <div key={idx} className="flex items-start gap-3 p-3 rounded-xl" style={{ background: "rgba(255,255,255,0.02)" }}>
+                          <div className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" style={{ background: "#334155" }} />
+                          <span className="text-sm" style={{ color: "#94a3b8" }}>{benefit}</span>
                         </div>
                       ))}
-                    </div>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-[#0a1628]/50 rounded-xl p-4 border border-white/10">
-                      <div className="flex items-center gap-2 mb-2">
-                        <DollarSign className="w-4 h-4 text-purple-400" />
-                        <span className="text-sm text-gray-400">Preço Mensal</span>
-                      </div>
-                      <p className="text-2xl font-bold text-white">
-                        €{mockUpsells.find((u) => u.name === selectedUpsell.name)?.price}
-                      </p>
-                    </div>
-                    <div className="bg-[#0a1628]/50 rounded-xl p-4 border border-white/10">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Users className="w-4 h-4 text-cyan-400" />
-                        <span className="text-sm text-gray-400">Clientes Ativos</span>
-                      </div>
-                      <p className="text-2xl font-bold text-white">
-                        {mockUpsells.find((u) => u.name === selectedUpsell.name)?.activeClients}
-                      </p>
                     </div>
                   </div>
                 </div>
