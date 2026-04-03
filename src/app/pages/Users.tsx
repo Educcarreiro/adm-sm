@@ -183,24 +183,28 @@ export function Users() {
                 </div>
 
                 <div className="flex gap-2 pt-4 border-t border-white/10">
-                  <Button
-                    onClick={() => { setSelectedUser(user); setShowPasswordModal(true); }}
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 border-white/10 hover:bg-white/5 text-gray-400"
-                  >
-                    <Key className="w-4 h-4 mr-2" />
-                    Senha
-                  </Button>
-                  <Button
-                    onClick={() => handleRemoveUser(user)}
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 border-red-500/20 hover:bg-red-500/10 text-red-400"
-                  >
-                    <XCircle className="w-4 h-4 mr-2" />
-                    Remover
-                  </Button>
+                  {isAdmin && (
+                    <Button
+                      onClick={() => { setSelectedUser(user); setShowPasswordModal(true); }}
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 border-white/10 hover:bg-white/5 text-gray-400"
+                    >
+                      <Key className="w-4 h-4 mr-2" />
+                      Senha
+                    </Button>
+                  )}
+                  {isAdmin && (
+                    <Button
+                      onClick={() => handleRemoveUser(user)}
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 border-red-500/20 hover:bg-red-500/10 text-red-400"
+                    >
+                      <XCircle className="w-4 h-4 mr-2" />
+                      Remover
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}
