@@ -28,17 +28,9 @@ export async function sendClientLoginEmail(params: {
   password: string;
   clubName: string;
 }): Promise<void> {
-  const response = await fetch(`${SUPABASE_URL}/functions/v1/send-client-login-email`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${SUPABASE_KEY}`,
-    },
-    body: JSON.stringify(params),
+  const { supabase } = await import("./supabase");
+  const { error } = await supabase.functions.invoke("send-client-login-email", {
+    body: params,
   });
-
-  if (!response.ok) {
-    const err = await response.json();
-    console.error("Erro ao enviar email de acesso:", err);
-  }
+  if (error) console.error("Erro ao enviar email de acesso:", error);
 }
