@@ -4,10 +4,12 @@ import { useAuth } from "../contexts/AuthContext";
 import {
   LayoutDashboard, Users, Ticket, Package,
   UserCog, FileText, LogOut, DollarSign,
-  ChevronLeft, ChevronRight, MessagesSquare,
+  ChevronLeft, ChevronRight, MessagesSquare, KeyRound,
 } from "lucide-react";
 import { addHistoryEntry } from "../../lib/historyService";
 import logoSrc from "../../assets/soccer_mind_sem_background.png";
+import { ChangePasswordModal } from "./ChangePasswordModal";
+import { updateOwnPassword } from "../../lib/usersService";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -21,6 +23,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
+  const [showOwnPasswordModal, setShowOwnPasswordModal] = useState(false);
 
   const w = collapsed ? COLLAPSED : EXPANDED;
 
@@ -201,17 +204,37 @@ export function MainLayout({ children }: MainLayoutProps) {
                 <p className="text-xs font-semibold text-white truncate">{user?.name}</p>
                 <p className="text-[10px] truncate" style={{ color: "#334155" }}>{user?.role}</p>
               </div>
+              <button
+                onClick={() => setShowOwnPasswordModal(true)}
+                title="Alterar minha senha"
+                className="flex-shrink-0 transition-colors"
+                style={{ color: "#2d4a5f" }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#22d3ee"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#2d4a5f"; }}
+              >
+                <KeyRound className="w-3.5 h-3.5" />
+              </button>
             </div>
           )}
 
           {collapsed && (
-            <div className="flex justify-center mb-1 py-1">
+            <div className="flex flex-col items-center gap-1 mb-1 py-1">
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
                 style={{ background: "rgba(34,211,238,0.1)", border: "1px solid rgba(34,211,238,0.18)", color: "#22d3ee" }}
               >
                 {user?.name.charAt(0)}
               </div>
+              <button
+                onClick={() => setShowOwnPasswordModal(true)}
+                title="Alterar minha senha"
+                className="transition-colors"
+                style={{ color: "#2d4a5f" }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "#22d3ee"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "#2d4a5f"; }}
+              >
+                <KeyRound className="w-3.5 h-3.5" />
+              </button>
             </div>
           )}
 
@@ -242,6 +265,15 @@ export function MainLayout({ children }: MainLayoutProps) {
       <main className="flex-1 overflow-auto" style={{ minWidth: 0 }}>
         {children}
       </main>
+
+      <ChangePasswordModal
+        open={showOwnPasswordModal}
+        onClose={() => setShowOwnPasswordModal(false)}
+        userName={user?.name || ""}
+        onChangePassword={async (newPassword) => {
+          if (user?.email) await updateOwnPassword(user.email, newPassword);
+        }}
+      />
 
       {/* Ambient orbs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">

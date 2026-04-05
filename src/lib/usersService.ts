@@ -43,3 +43,11 @@ export async function updateUserPassword(id: string, password: string): Promise<
     .eq("id", id);
   if (error) throw error;
 }
+
+export async function updateOwnPassword(email: string, password: string): Promise<void> {
+  const { error } = await supabase
+    .from("internal_users")
+    .update({ password })
+    .eq("email", email);
+  if (error) throw error;
+}

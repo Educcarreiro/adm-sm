@@ -16,8 +16,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Eye, EyeOff } from "lucide-react";
-import { fetchRoleCategories, type RoleCategory } from "../../lib/roleCategoriesService";
+import { Eye, EyeOff, Plus, X, Tags } from "lucide-react";
+import {
+  fetchRoleCategories,
+  addRoleCategory,
+  removeRoleCategory,
+  type RoleCategory,
+} from "../../lib/roleCategoriesService";
 
 const DEFAULT_ROLES = ["Administrador", "PMO", "Desenvolvedor Sênior", "Suporte"];
 
@@ -37,11 +42,11 @@ export function AddUserModal({ open, onClose, onAdd }: AddUserModalProps) {
   const [formData, setFormData] = useState({ name: "", email: "", role: "Suporte", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [extraRoles, setExtraRoles] = useState<RoleCategory[]>([]);
+  const [newRole, setNewRole] = useState("");
+  const [showRoleManager, setShowRoleManager] = useState(false);
 
   useEffect(() => {
-    if (open) {
-      fetchRoleCategories().then(setExtraRoles).catch(() => {});
-    }
+    if (open) fetchRoleCategories().then(setExtraRoles).catch(() => {});
   }, [open]);
 
   const getRolePermissions = (role: string): string[] => {
@@ -52,6 +57,20 @@ export function AddUserModal({ open, onClose, onAdd }: AddUserModalProps) {
       case "Suporte": return ["view_clients", "manage_tickets"];
       default: return ["view_clients"];
     }
+  };
+
+  const handleAddRole = async () => {
+    const name = newRole.trim();
+    if (!name) return;
+    const created = await addRoleCategory(name);
+    setExtraRoles((prev) => [...prev, created]);
+    setNewRole("");
+  };
+
+  const handleRemoveRole = async (id: string, name: string) => {
+    await removeRoleCategory(id);
+    setExtraRoles((prev) => prev.filter((r) => r.id !== id));
+    if (formData.role === name) setFormData({ ...formData, role: "Suporte" });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -65,6 +84,7 @@ export function AddUserModal({ open, onClose, onAdd }: AddUserModalProps) {
     });
     setFormData({ name: "", email: "", role: "Suporte", password: "" });
     setShowPassword(false);
+    setShowRoleManager(false);
     onClose();
   };
 
@@ -93,18 +113,58 @@ export function AddUserModal({ open, onClose, onAdd }: AddUserModalProps) {
               className="bg-[#0a1929]/80 border-white/10 text-white mt-2" placeholder="joao@soccermind.com" required />
           </div>
 
+          {/* Cargo + gerenciar categorias */}
           <div>
-            <Label className="text-gray-300">Cargo</Label>
+            <div className="flex items-center justify-between mb-2">
+              <Label className="text-gray-300">Cargo</Label>
+              <button type="button" onClick={() => setShowRoleManager(!showRoleManager)}
+                className="flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 transition-colors">
+                <Tags className="w-3 h-3" />
+                {showRoleManager ? "Fechar" : "Gerenciar cargos"}
+              </button>
+            </div>
             <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-              <SelectTrigger className="bg-[#0a1929]/80 border-white/10 text-white mt-2">
+              <SelectTrigger className="bg-[#0a1929]/80 border-white/10 text-white">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-[#0f1c2e] border-white/10">
                 {allRoles.map((role) => (
-                  <SelectItem key={role} value={role}>{role}</SelectItem>
+                  <SelectItem key={role} value={role} className="text-white focus:bg-white/10 focus:text-white">{role}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
+
+            {/* Gerenciador inline */}
+            {showRoleManager && (
+              <div className="mt-3 p-3 bg-white/5 border border-white/10 rounded-lg space-y-3">
+                <p className="text-xs text-gray-500">Cargos customizados</p>
+                <div className="flex gap-2">
+                  <Input value={newRole} onChange={(e) => setNewRole(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddRole())}
+                    placeholder="Ex: Analista de Dados"
+                    className="bg-[#0a1929]/80 border-white/10 text-white text-sm h-8" />
+                  <Button type="button" onClick={handleAddRole} disabled={!newRole.trim()}
+                    className="bg-cyan-500 hover:bg-cyan-600 text-white h-8 w-8 p-0 flex-shrink-0">
+                    <Plus className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+                {extraRoles.length === 0 ? (
+                  <p className="text-xs text-gray-600">Nenhum cargo customizado ainda.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {extraRoles.map((role) => (
+                      <div key={role.id} className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded px-2 py-1">
+                        <span className="text-white text-xs">{role.name}</span>
+                        <button type="button" onClick={() => handleRemoveRole(role.id, role.name)}
+                          className="text-gray-500 hover:text-red-400 transition-colors">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div>
