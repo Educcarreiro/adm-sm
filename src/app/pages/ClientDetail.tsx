@@ -75,7 +75,9 @@ export function ClientDetail() {
     if (!id || !club) return;
     const created = await addClientLogin({ club_id: id, ...loginData });
     setLogins((prev) => [...prev, created]);
-    await sendClientLoginEmail({ ...loginData, clubName: club.name });
+    sendClientLoginEmail({ ...loginData, clubName: club.name }).catch((err) =>
+      console.error("Erro ao enviar email:", err)
+    );
   };
 
   const handleDeleteLogin = async () => {
