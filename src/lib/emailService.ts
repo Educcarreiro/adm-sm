@@ -21,3 +21,24 @@ export async function sendWelcomeEmail(params: {
     console.error("Erro ao enviar email:", err);
   }
 }
+
+export async function sendClientLoginEmail(params: {
+  name: string;
+  email: string;
+  password: string;
+  clubName: string;
+}): Promise<void> {
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/send-client-login-email`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+    },
+    body: JSON.stringify(params),
+  });
+
+  if (!response.ok) {
+    const err = await response.json();
+    console.error("Erro ao enviar email de acesso:", err);
+  }
+}

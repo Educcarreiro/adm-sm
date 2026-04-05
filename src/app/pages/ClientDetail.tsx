@@ -8,6 +8,7 @@ import {
   removeClientLogin,
   type ClientLogin,
 } from "../../lib/clientLoginsService";
+import { sendClientLoginEmail } from "../../lib/emailService";
 import { mockUpsells, clubUpsells } from "../data/mockData";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
@@ -71,9 +72,10 @@ export function ClientDetail() {
   };
 
   const handleAddLogin = async (loginData: { name: string; email: string; password: string }) => {
-    if (!id) return;
+    if (!id || !club) return;
     const created = await addClientLogin({ club_id: id, ...loginData });
     setLogins((prev) => [...prev, created]);
+    await sendClientLoginEmail({ ...loginData, clubName: club.name });
   };
 
   const handleDeleteLogin = async () => {
