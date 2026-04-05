@@ -121,7 +121,7 @@ export function AddUserModal({ open, onClose, onAdd }: AddUserModalProps) {
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1 border-white/10 hover:bg-white/5">
+            <Button type="button" variant="outline" onClick={onClose} className="flex-1 border-white/10 hover:bg-white/5 text-white">
               Cancelar
             </Button>
             <Button type="submit" className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white">

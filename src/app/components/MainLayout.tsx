@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import {
   LayoutDashboard, Users, Ticket, Package,
   UserCog, FileText, LogOut, DollarSign,
-  ChevronLeft, ChevronRight, History, MessagesSquare,
+  ChevronLeft, ChevronRight, MessagesSquare,
 } from "lucide-react";
 import { addHistoryEntry } from "../../lib/historyService";
 import logoSrc from "../../assets/soccer_mind_sem_background.png";
@@ -27,9 +27,9 @@ export function MainLayout({ children }: MainLayoutProps) {
   const isAdmin = user?.role === "Administrador";
 
   const PAGE_LABELS: Record<string, string> = {
-    "/dashboard": "Dashboard", "/clients": "Clientes", "/service-desk": "Service Desk",
-    "/upsells": "Upsells", "/pricing": "Preços", "/contracts": "Contratos",
-    "/users": "Usuários", "/demandas": "Demandas", "/history": "Histórico",
+    "/dashboard": "Dashboard", "/demandas": "Demandas", "/clients": "Clientes",
+    "/service-desk": "Service Desk", "/upsells": "Upsells", "/pricing": "Preços",
+    "/contracts": "Contratos", "/users": "Usuários",
   };
 
   useEffect(() => {
@@ -40,14 +40,13 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   const menuItems = [
     { path: "/dashboard",    icon: LayoutDashboard, label: "Dashboard",    adminOnly: false },
+    { path: "/demandas",     icon: MessagesSquare,  label: "Demandas",     adminOnly: false },
     { path: "/clients",      icon: Users,           label: "Clientes",     adminOnly: false },
     { path: "/service-desk", icon: Ticket,          label: "Service Desk", adminOnly: false },
     { path: "/upsells",      icon: Package,         label: "Upsells",      adminOnly: true  },
     { path: "/pricing",      icon: DollarSign,      label: "Preços",       adminOnly: true  },
     { path: "/contracts",    icon: FileText,        label: "Contratos",    adminOnly: true  },
     { path: "/users",        icon: UserCog,         label: "Usuários",     adminOnly: false },
-    { path: "/demandas",     icon: MessagesSquare,  label: "Demandas",     adminOnly: false },
-    { path: "/history",      icon: History,         label: "Histórico",    adminOnly: false },
   ].filter((item) => !item.adminOnly || isAdmin);
 
   return (

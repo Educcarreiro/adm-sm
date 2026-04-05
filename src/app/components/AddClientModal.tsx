@@ -180,7 +180,7 @@ export function AddClientModal({ open, onClose, onAdd }: AddClientModalProps) {
               type="button"
               variant="outline"
               onClick={onClose}
-              className="flex-1 border-white/10 hover:bg-white/5"
+              className="flex-1 border-white/10 hover:bg-white/5 text-white"
             >
               Cancelar
             </Button>

@@ -9,7 +9,6 @@ import { Upsells } from "./pages/Upsells";
 import { Users } from "./pages/Users";
 import { Contracts } from "./pages/Contracts";
 import { Pricing } from "./pages/Pricing";
-import { History } from "./pages/History";
 import { Demandas } from "./pages/Demandas";
 import { ProtectedLayout } from "./components/ProtectedLayout";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -59,10 +58,6 @@ export const router = createBrowserRouter([
       {
         path: "/contracts",
         element: <Contracts />,
-      },
-      {
-        path: "/history",
-        element: <History />,
       },
       {
         path: "/demandas",
