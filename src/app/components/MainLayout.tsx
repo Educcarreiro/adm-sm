@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import {
   LayoutDashboard, Users, Ticket, Package,
   UserCog, FileText, LogOut, DollarSign,
-  ChevronLeft, ChevronRight, History,
+  ChevronLeft, ChevronRight, History, MessagesSquare,
 } from "lucide-react";
 import { addHistoryEntry } from "../../lib/historyService";
 import logoSrc from "../../assets/soccer_mind_sem_background.png";
@@ -29,7 +29,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   const PAGE_LABELS: Record<string, string> = {
     "/dashboard": "Dashboard", "/clients": "Clientes", "/service-desk": "Service Desk",
     "/upsells": "Upsells", "/pricing": "Preços", "/contracts": "Contratos",
-    "/users": "Usuários", "/history": "Histórico",
+    "/users": "Usuários", "/demandas": "Demandas", "/history": "Histórico",
   };
 
   useEffect(() => {
@@ -46,6 +46,7 @@ export function MainLayout({ children }: MainLayoutProps) {
     { path: "/pricing",      icon: DollarSign,      label: "Preços",       adminOnly: true  },
     { path: "/contracts",    icon: FileText,        label: "Contratos",    adminOnly: true  },
     { path: "/users",        icon: UserCog,         label: "Usuários",     adminOnly: false },
+    { path: "/demandas",     icon: MessagesSquare,  label: "Demandas",     adminOnly: false },
     { path: "/history",      icon: History,         label: "Histórico",    adminOnly: false },
   ].filter((item) => !item.adminOnly || isAdmin);
 
