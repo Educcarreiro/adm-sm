@@ -1,19 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
 import { MainLayout } from "../components/MainLayout";
-import { mockClubs, mockUpsells, clubUpsells } from "../data/mockData";
+import { fetchClubById, type Club } from "../../lib/clubsService";
+import { mockUpsells, clubUpsells } from "../data/mockData";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
-import { ArrowLeft, Calendar, User, Users as UsersIcon, DollarSign } from "lucide-react";
+import { ArrowLeft, Calendar, Users as UsersIcon, DollarSign } from "lucide-react";
 import { Switch } from "../components/ui/switch";
 
 export function ClientDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const club = mockClubs.find((c) => c.id === id);
+  const [club, setClub] = useState<Club | null>(null);
+  const [loading, setLoading] = useState(true);
   const [activeUpsellIds, setActiveUpsellIds] = useState<string[]>(
     clubUpsells[id || ""] || []
   );
+
+  useEffect(() => {
+    if (!id) { setLoading(false); return; }
+    fetchClubById(id).then((data) => {
+      setClub(data);
+      setLoading(false);
+    });
+  }, [id]);
+
+  if (loading) {
+    return (
+      <MainLayout>
+        <div className="p-8">
+          <p className="text-gray-400">Carregando...</p>
+        </div>
+      </MainLayout>
+    );
+  }
 
   if (!club) {
     return (
@@ -67,7 +87,7 @@ export function ClientDetail() {
               <DollarSign className="w-5 h-5 text-green-400" />
               <p className="text-sm text-gray-400">Valor Mensal</p>
             </div>
-            <p className="text-2xl font-bold text-white">€{club.monthlyValue.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-white">R$ {club.monthly_value.toLocaleString()}</p>
           </div>
 
           <div className="bg-[#0f1c2e]/50 backdrop-blur-xl border border-white/10 rounded-xl p-6">
@@ -75,7 +95,7 @@ export function ClientDetail() {
               <UsersIcon className="w-5 h-5 text-cyan-400" />
               <p className="text-sm text-gray-400">Usuários Ativos</p>
             </div>
-            <p className="text-2xl font-bold text-white">{club.activeUsers}</p>
+            <p className="text-2xl font-bold text-white">{club.active_users}</p>
           </div>
 
           <div className="bg-[#0f1c2e]/50 backdrop-blur-xl border border-white/10 rounded-xl p-6">
@@ -84,7 +104,7 @@ export function ClientDetail() {
               <p className="text-sm text-gray-400">Data de Cadastro</p>
             </div>
             <p className="text-xl font-bold text-white">
-              {new Date(club.createdAt).toLocaleDateString("pt-BR")}
+              {new Date(club.created_at).toLocaleDateString("pt-BR")}
             </p>
           </div>
         </div>

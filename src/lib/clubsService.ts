@@ -21,6 +21,16 @@ export async function fetchClubs(): Promise<Club[]> {
   return data ?? [];
 }
 
+export async function fetchClubById(id: string): Promise<Club | null> {
+  const { data, error } = await supabase
+    .from("clubs")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (error) return null;
+  return data;
+}
+
 export async function addClub(club: Omit<Club, "id" | "created_at">): Promise<Club> {
   const { data, error } = await supabase
     .from("clubs")
