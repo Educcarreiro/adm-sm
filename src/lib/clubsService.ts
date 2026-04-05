@@ -31,6 +31,17 @@ export async function fetchClubById(id: string): Promise<Club | null> {
   return data;
 }
 
+export async function updateClub(id: string, updates: Partial<Omit<Club, "id" | "created_at">>): Promise<Club> {
+  const { data, error } = await supabase
+    .from("clubs")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
 export async function deleteClub(id: string): Promise<void> {
   const { error } = await supabase.from("clubs").delete().eq("id", id);
   if (error) throw error;

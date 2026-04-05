@@ -7,12 +7,19 @@ import {
   updateUserPassword,
   type InternalUser,
 } from "../../lib/usersService";
+import {
+  fetchRoleCategories,
+  addRoleCategory,
+  removeRoleCategory,
+  type RoleCategory,
+} from "../../lib/roleCategoriesService";
 import { sendWelcomeEmail } from "../../lib/emailService";
 import { AddUserModal } from "../components/AddUserModal";
 import { ChangePasswordModal } from "../components/ChangePasswordModal";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
-import { Mail, User, Shield, Plus, Key, XCircle } from "lucide-react";
+import { Input } from "../components/ui/input";
+import { Mail, User, Shield, Plus, Key, XCircle, Tags } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
 export function Users() {
@@ -23,6 +30,8 @@ export function Users() {
   const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<InternalUser | null>(null);
+  const [roleCategories, setRoleCategories] = useState<RoleCategory[]>([]);
+  const [newRole, setNewRole] = useState("");
 
   const loadUsers = async () => {
     try {
@@ -35,7 +44,28 @@ export function Users() {
     }
   };
 
-  useEffect(() => { loadUsers(); }, []);
+  const loadRoleCategories = async () => {
+    fetchRoleCategories().then(setRoleCategories).catch(() => {});
+  };
+
+  useEffect(() => { loadUsers(); loadRoleCategories(); }, []);
+
+  const handleAddRole = async () => {
+    const name = newRole.trim();
+    if (!name) return;
+    try {
+      const created = await addRoleCategory(name);
+      setRoleCategories((prev) => [...prev, created]);
+      setNewRole("");
+    } catch (err) {
+      console.error("Erro ao criar cargo:", err);
+    }
+  };
+
+  const handleRemoveRole = async (id: string) => {
+    await removeRoleCategory(id);
+    setRoleCategories((prev) => prev.filter((r) => r.id !== id));
+  };
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -211,6 +241,47 @@ export function Users() {
           </div>
         )}
       </div>
+
+      {/* Gerenciar Cargos — só admin */}
+      {isAdmin && (
+        <div className="mt-8 bg-[#0f1c2e]/50 backdrop-blur-xl border border-white/10 rounded-xl p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Tags className="w-5 h-5 text-cyan-400" />
+            <h2 className="text-lg font-bold text-white">Categorias de Cargo</h2>
+          </div>
+          <p className="text-gray-400 text-sm mb-4">Crie novos cargos que ficarão disponíveis ao cadastrar usuários.</p>
+
+          <div className="flex gap-2 mb-4">
+            <Input
+              value={newRole}
+              onChange={(e) => setNewRole(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddRole())}
+              placeholder="Ex: Analista de Dados"
+              className="bg-[#0a1929]/80 border-white/10 text-white"
+            />
+            <Button onClick={handleAddRole} className="bg-cyan-500 hover:bg-cyan-600 text-white px-4">
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {roleCategories.length === 0 ? (
+              <p className="text-gray-500 text-sm">Nenhum cargo customizado cadastrado.</p>
+            ) : (
+              roleCategories.map((role) => (
+                <div key={role.id}
+                  className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5">
+                  <span className="text-white text-sm">{role.name}</span>
+                  <button onClick={() => handleRemoveRole(role.id)}
+                    className="text-gray-500 hover:text-red-400 transition-colors">
+                    <XCircle className="w-4 h-4" />
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
 
       <AddUserModal
         open={showAddUserModal}

@@ -27,6 +27,7 @@ interface AddClientModalProps {
     responsible: string;
     email: string;
     maxUsers: number;
+    planDuration: number;
     status: "active" | "inactive";
   }) => void;
 }
@@ -39,6 +40,7 @@ export function AddClientModal({ open, onClose, onAdd }: AddClientModalProps) {
     responsible: "",
     email: "",
     maxUsers: "",
+    planDuration: "12",
     status: "active" as "active" | "inactive",
   });
 
@@ -51,6 +53,7 @@ export function AddClientModal({ open, onClose, onAdd }: AddClientModalProps) {
       responsible: formData.responsible,
       email: formData.email,
       maxUsers: Number(formData.maxUsers),
+      planDuration: Number(formData.planDuration),
       status: formData.status,
     });
     setFormData({
@@ -60,6 +63,7 @@ export function AddClientModal({ open, onClose, onAdd }: AddClientModalProps) {
       responsible: "",
       email: "",
       maxUsers: "",
+      planDuration: "12",
       status: "active",
     });
     onClose();
@@ -113,91 +117,62 @@ export function AddClientModal({ open, onClose, onAdd }: AddClientModalProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="monthlyValue" className="text-gray-300">
-                Valor Mensal (€)
-              </Label>
-              <Input
-                id="monthlyValue"
-                type="number"
-                value={formData.monthlyValue}
-                onChange={(e) =>
-                  setFormData({ ...formData, monthlyValue: e.target.value })
-                }
-                className="bg-[#0a1929]/80 border-white/10 text-white mt-2"
-                placeholder="2500"
-                required
-              />
+              <Label className="text-gray-300">Duração do Plano</Label>
+              <Select value={formData.planDuration} onValueChange={(value) => setFormData({ ...formData, planDuration: value })}>
+                <SelectTrigger className="bg-[#0a1929]/80 border-white/10 text-white mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-[#0f1c2e] border-white/10">
+                  <SelectItem value="1">1 mês</SelectItem>
+                  <SelectItem value="3">3 meses</SelectItem>
+                  <SelectItem value="6">6 meses</SelectItem>
+                  <SelectItem value="12">12 meses</SelectItem>
+                  <SelectItem value="24">24 meses</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-
             <div>
-              <Label htmlFor="maxUsers" className="text-gray-300">
-                Número de Usuários Permitidos
-              </Label>
-              <Input
-                id="maxUsers"
-                type="number"
-                value={formData.maxUsers}
-                onChange={(e) =>
-                  setFormData({ ...formData, maxUsers: e.target.value })
-                }
-                className="bg-[#0a1929]/80 border-white/10 text-white mt-2"
-                placeholder="5"
-                required
-              />
+              <Label htmlFor="monthlyValue" className="text-gray-300">Valor Mensal (R$)</Label>
+              <Input id="monthlyValue" type="number" value={formData.monthlyValue}
+                onChange={(e) => setFormData({ ...formData, monthlyValue: e.target.value })}
+                className="bg-[#0a1929]/80 border-white/10 text-white mt-2" placeholder="2500" required />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="responsible" className="text-gray-300">
-                Responsável do Clube
-              </Label>
-              <Input
-                id="responsible"
-                value={formData.responsible}
-                onChange={(e) =>
-                  setFormData({ ...formData, responsible: e.target.value })
-                }
-                className="bg-[#0a1929]/80 border-white/10 text-white mt-2"
-                placeholder="João Silva"
-                required
-              />
+              <Label htmlFor="maxUsers" className="text-gray-300">Usuários Permitidos</Label>
+              <Input id="maxUsers" type="number" value={formData.maxUsers}
+                onChange={(e) => setFormData({ ...formData, maxUsers: e.target.value })}
+                className="bg-[#0a1929]/80 border-white/10 text-white mt-2" placeholder="5" required />
             </div>
-
             <div>
-              <Label htmlFor="email" className="text-gray-300">
-                Email do Responsável
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="bg-[#0a1929]/80 border-white/10 text-white mt-2"
-                placeholder="joao@clube.com"
-                required
-              />
+              <Label htmlFor="status" className="text-gray-300">Status da Conta</Label>
+              <Select value={formData.status} onValueChange={(value: "active" | "inactive") => setFormData({ ...formData, status: value })}>
+                <SelectTrigger className="bg-[#0a1929]/80 border-white/10 text-white mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-[#0f1c2e] border-white/10">
+                  <SelectItem value="active">Ativo</SelectItem>
+                  <SelectItem value="inactive">Inativo</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="status" className="text-gray-300">
-              Status da Conta
-            </Label>
-            <Select
-              value={formData.status}
-              onValueChange={(value: "active" | "inactive") =>
-                setFormData({ ...formData, status: value })
-              }
-            >
-              <SelectTrigger className="bg-[#0a1929]/80 border-white/10 text-white mt-2">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-[#0f1c2e] border-white/10">
-                <SelectItem value="active">Ativo</SelectItem>
-                <SelectItem value="inactive">Inativo</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="responsible" className="text-gray-300">Responsável do Clube</Label>
+              <Input id="responsible" value={formData.responsible}
+                onChange={(e) => setFormData({ ...formData, responsible: e.target.value })}
+                className="bg-[#0a1929]/80 border-white/10 text-white mt-2" placeholder="João Silva" required />
+            </div>
+            <div>
+              <Label htmlFor="email" className="text-gray-300">Email do Responsável</Label>
+              <Input id="email" type="email" value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="bg-[#0a1929]/80 border-white/10 text-white mt-2" placeholder="joao@clube.com" required />
+            </div>
           </div>
 
           <div className="flex gap-3 pt-4">

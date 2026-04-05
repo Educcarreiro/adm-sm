@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +17,9 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { Eye, EyeOff } from "lucide-react";
+import { fetchRoleCategories, type RoleCategory } from "../../lib/roleCategoriesService";
+
+const DEFAULT_ROLES = ["Administrador", "PMO", "Desenvolvedor Sênior", "Suporte"];
 
 interface AddUserModalProps {
   open: boolean;
@@ -31,13 +34,15 @@ interface AddUserModalProps {
 }
 
 export function AddUserModal({ open, onClose, onAdd }: AddUserModalProps) {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    role: "Suporte",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ name: "", email: "", role: "Suporte", password: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [extraRoles, setExtraRoles] = useState<RoleCategory[]>([]);
+
+  useEffect(() => {
+    if (open) {
+      fetchRoleCategories().then(setExtraRoles).catch(() => {});
+    }
+  }, [open]);
 
   const getRolePermissions = (role: string): string[] => {
     switch (role) {
@@ -63,6 +68,8 @@ export function AddUserModal({ open, onClose, onAdd }: AddUserModalProps) {
     onClose();
   };
 
+  const allRoles = [...DEFAULT_ROLES, ...extraRoles.map((r) => r.name)];
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="bg-[#0f1c2e] border-white/10 text-white max-w-xl">
@@ -76,25 +83,14 @@ export function AddUserModal({ open, onClose, onAdd }: AddUserModalProps) {
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div>
             <Label className="text-gray-300">Nome Completo</Label>
-            <Input
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="bg-[#0a1929]/80 border-white/10 text-white mt-2"
-              placeholder="João Silva"
-              required
-            />
+            <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="bg-[#0a1929]/80 border-white/10 text-white mt-2" placeholder="João Silva" required />
           </div>
 
           <div>
             <Label className="text-gray-300">Email</Label>
-            <Input
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="bg-[#0a1929]/80 border-white/10 text-white mt-2"
-              placeholder="joao@soccermind.com"
-              required
-            />
+            <Input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="bg-[#0a1929]/80 border-white/10 text-white mt-2" placeholder="joao@soccermind.com" required />
           </div>
 
           <div>
@@ -104,10 +100,9 @@ export function AddUserModal({ open, onClose, onAdd }: AddUserModalProps) {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-[#0f1c2e] border-white/10">
-                <SelectItem value="Administrador">Administrador</SelectItem>
-                <SelectItem value="PMO">PMO</SelectItem>
-                <SelectItem value="Desenvolvedor Sênior">Desenvolvedor Sênior</SelectItem>
-                <SelectItem value="Suporte">Suporte</SelectItem>
+                {allRoles.map((role) => (
+                  <SelectItem key={role} value={role}>{role}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -115,19 +110,11 @@ export function AddUserModal({ open, onClose, onAdd }: AddUserModalProps) {
           <div>
             <Label className="text-gray-300">Senha Inicial</Label>
             <div className="relative mt-2">
-              <Input
-                type={showPassword ? "text" : "password"}
-                value={formData.password}
+              <Input type={showPassword ? "text" : "password"} value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="bg-[#0a1929]/80 border-white/10 text-white pr-10"
-                placeholder="••••••••"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
-              >
+                className="bg-[#0a1929]/80 border-white/10 text-white pr-10" placeholder="••••••••" required />
+              <button type="button" onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors">
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
