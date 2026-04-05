@@ -100,7 +100,8 @@ export function Demandas() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "demanda_messages", filter: `demanda_id=eq.${selected.id}` },
         (payload) => {
-          setMessages((prev) => [...prev, payload.new as DemandaMessage]);
+          const msg = payload.new as DemandaMessage;
+          setMessages((prev) => prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]);
         }
       )
       .subscribe();
@@ -116,7 +117,8 @@ export function Demandas() {
     if (!input.trim() || !selected || !user) return;
     setSending(true);
     try {
-      await sendMessage({ demanda_id: selected.id, author: user.name, content: input.trim() });
+      const created = await sendMessage({ demanda_id: selected.id, author: user.name, content: input.trim() });
+      setMessages((prev) => [...prev, created]);
       setInput("");
     } catch (err) {
       console.error(err);
