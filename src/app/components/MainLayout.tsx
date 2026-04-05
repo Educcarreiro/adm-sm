@@ -1,11 +1,12 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useAuth } from "../contexts/AuthContext";
 import {
   LayoutDashboard, Users, Ticket, Package,
   UserCog, FileText, LogOut, DollarSign,
-  ChevronLeft, ChevronRight,
+  ChevronLeft, ChevronRight, History,
 } from "lucide-react";
+import { addHistoryEntry } from "../../lib/historyService";
 import logoSrc from "../../assets/soccer_mind_sem_background.png";
 
 interface MainLayoutProps {
@@ -25,6 +26,18 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   const isAdmin = user?.role === "Administrador";
 
+  const PAGE_LABELS: Record<string, string> = {
+    "/dashboard": "Dashboard", "/clients": "Clientes", "/service-desk": "Service Desk",
+    "/upsells": "Upsells", "/pricing": "Preços", "/contracts": "Contratos",
+    "/users": "Usuários", "/history": "Histórico",
+  };
+
+  useEffect(() => {
+    const label = PAGE_LABELS[location.pathname] ?? location.pathname;
+    addHistoryEntry({ type: "navigate", description: `Acessou: ${label}`, user: user?.name, meta: { page: location.pathname } });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
   const menuItems = [
     { path: "/dashboard",    icon: LayoutDashboard, label: "Dashboard",    adminOnly: false },
     { path: "/clients",      icon: Users,           label: "Clientes",     adminOnly: false },
@@ -33,6 +46,7 @@ export function MainLayout({ children }: MainLayoutProps) {
     { path: "/pricing",      icon: DollarSign,      label: "Preços",       adminOnly: true  },
     { path: "/contracts",    icon: FileText,        label: "Contratos",    adminOnly: true  },
     { path: "/users",        icon: UserCog,         label: "Usuários",     adminOnly: false },
+    { path: "/history",      icon: History,         label: "Histórico",    adminOnly: false },
   ].filter((item) => !item.adminOnly || isAdmin);
 
   return (

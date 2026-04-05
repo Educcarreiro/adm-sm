@@ -44,37 +44,32 @@ export function Login() {
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         {/* Main cyan orb top-left */}
         <div
-          className="absolute -top-40 -left-40 rounded-full animate-pulse"
+          className="absolute -top-40 -left-40 rounded-full"
           style={{
             width: "600px",
             height: "600px",
             background: "radial-gradient(circle, rgba(6,182,212,0.15) 0%, rgba(59,130,246,0.08) 50%, transparent 70%)",
             filter: "blur(60px)",
-            animationDuration: "4s",
           }}
         />
         {/* Blue/purple orb bottom-right */}
         <div
-          className="absolute -bottom-40 -right-40 rounded-full animate-pulse"
+          className="absolute -bottom-40 -right-40 rounded-full"
           style={{
             width: "700px",
             height: "700px",
             background: "radial-gradient(circle, rgba(99,102,241,0.12) 0%, rgba(59,130,246,0.06) 50%, transparent 70%)",
             filter: "blur(80px)",
-            animationDuration: "6s",
-            animationDelay: "2s",
           }}
         />
         {/* Small accent orb center */}
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full animate-pulse"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{
             width: "300px",
             height: "300px",
             background: "radial-gradient(circle, rgba(6,182,212,0.05) 0%, transparent 70%)",
             filter: "blur(40px)",
-            animationDuration: "8s",
-            animationDelay: "1s",
           }}
         />
         {/* Subtle tech grid */}

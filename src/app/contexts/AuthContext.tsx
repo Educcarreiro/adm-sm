@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { supabase } from "../../lib/supabase";
+import { addHistoryEntry } from "../../lib/historyService";
 
 interface User {
   email: string;
@@ -30,10 +31,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (data.password !== password) return false;
 
     setUser({ email: data.email, name: data.name, role: data.role });
+    addHistoryEntry({ type: "login", description: `Login realizado`, user: data.name });
     return true;
   };
 
   const logout = () => {
+    if (user) addHistoryEntry({ type: "logout", description: `Logout`, user: user.name });
     setUser(null);
   };
 
