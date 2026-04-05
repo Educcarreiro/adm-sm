@@ -44,6 +44,11 @@ export async function updateDemandaStatus(id: string, status: "open" | "resolved
   if (error) throw error;
 }
 
+export async function deleteDemanda(id: string): Promise<void> {
+  const { error } = await supabase.from("demandas").delete().eq("id", id);
+  if (error) throw error;
+}
+
 export async function fetchMessages(demandaId: string): Promise<DemandaMessage[]> {
   const { data, error } = await supabase
     .from("demanda_messages")

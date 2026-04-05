@@ -178,9 +178,8 @@ export function AddClientModal({ open, onClose, onAdd }: AddClientModalProps) {
           <div className="flex gap-3 pt-4">
             <Button
               type="button"
-              variant="outline"
               onClick={onClose}
-              className="flex-1 border-white/10 hover:bg-white/5 text-white"
+              className="flex-1 bg-white/10 border border-white/15 text-white hover:bg-white/15"
             >
               Cancelar
             </Button>

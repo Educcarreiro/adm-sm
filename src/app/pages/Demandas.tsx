@@ -4,6 +4,7 @@ import {
   fetchDemandas,
   createDemanda,
   updateDemandaStatus,
+  deleteDemanda,
   fetchMessages,
   sendMessage,
   type Demanda,
@@ -38,6 +39,7 @@ import {
   MessageSquare,
   Circle,
   User,
+  Trash2,
 } from "lucide-react";
 
 const PRIORITY_CONFIG = {
@@ -150,6 +152,13 @@ export function Demandas() {
     setDemandas((prev) => prev.map((d) => d.id === updated.id ? updated : d));
   };
 
+  const handleDelete = async () => {
+    if (!selected || !confirm(`Apagar a demanda "${selected.title}"? Esta ação não pode ser desfeita.`)) return;
+    await deleteDemanda(selected.id);
+    setDemandas((prev) => prev.filter((d) => d.id !== selected.id));
+    setSelected(null);
+  };
+
   const openDemandas = demandas.filter((d) => d.status === "open");
   const resolvedDemandas = demandas.filter((d) => d.status === "resolved");
 
@@ -229,9 +238,17 @@ export function Demandas() {
                 </Button>
               )}
               {selected.status === "resolved" && (
-                <Badge className="bg-green-500/10 text-green-400 border-green-500/20 flex-shrink-0">
-                  <CheckCircle className="w-3 h-3 mr-1" />Resolvida
-                </Badge>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <Badge className="bg-green-500/10 text-green-400 border-green-500/20">
+                    <CheckCircle className="w-3 h-3 mr-1" />Resolvida
+                  </Badge>
+                  {isAdmin && (
+                    <Button onClick={handleDelete} variant="ghost" size="sm"
+                      className="text-red-400 hover:text-red-300 hover:bg-red-500/10">
+                      <Trash2 className="w-4 h-4 mr-1.5" />Apagar
+                    </Button>
+                  )}
+                </div>
               )}
             </div>
 
@@ -357,7 +374,7 @@ export function Demandas() {
 
             <div className="flex gap-3 pt-2">
               <Button variant="outline" onClick={() => setShowNew(false)}
-                className="flex-1 border-white/10 hover:bg-white/5 text-white">Cancelar</Button>
+                className="flex-1 bg-white/10 border border-white/15 text-white hover:bg-white/15">Cancelar</Button>
               <Button onClick={handleCreate} disabled={!newForm.title.trim()}
                 className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white">Criar Demanda</Button>
             </div>
