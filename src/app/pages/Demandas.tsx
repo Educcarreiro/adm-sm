@@ -9,6 +9,7 @@ import {
   type Demanda,
   type DemandaMessage,
 } from "../../lib/demandasService";
+import { fetchInternalUsers, type InternalUser } from "../../lib/usersService";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../contexts/AuthContext";
 import { Badge } from "../components/ui/badge";
@@ -36,6 +37,7 @@ import {
   AlertCircle,
   MessageSquare,
   Circle,
+  User,
 } from "lucide-react";
 
 const PRIORITY_CONFIG = {
@@ -56,18 +58,25 @@ function timeAgo(dateStr: string) {
 
 export function Demandas() {
   const { user } = useAuth();
+  const isAdmin = user?.role === "Administrador";
+
   const [demandas, setDemandas] = useState<Demanda[]>([]);
   const [selected, setSelected] = useState<Demanda | null>(null);
   const [messages, setMessages] = useState<DemandaMessage[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [showNew, setShowNew] = useState(false);
-  const [newForm, setNewForm] = useState({ title: "", priority: "normal" as Demanda["priority"] });
+  const [users, setUsers] = useState<InternalUser[]>([]);
+  const [newForm, setNewForm] = useState({
+    title: "",
+    priority: "normal" as Demanda["priority"],
+    assigned_to: "",
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Load demandas
   useEffect(() => {
     fetchDemandas().then(setDemandas).catch(console.error);
+    fetchInternalUsers().then(setUsers).catch(console.error);
 
     const channel = supabase
       .channel("demandas-list")
@@ -79,7 +88,6 @@ export function Demandas() {
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  // Load messages when demand selected
   useEffect(() => {
     if (!selected) return;
     fetchMessages(selected.id).then(setMessages).catch(console.error);
@@ -98,7 +106,6 @@ export function Demandas() {
     return () => { supabase.removeChannel(channel); };
   }, [selected?.id]);
 
-  // Scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -124,10 +131,11 @@ export function Demandas() {
         priority: newForm.priority,
         status: "open",
         created_by: user.name,
+        assigned_to: newForm.assigned_to || null,
       });
       setDemandas((prev) => [created, ...prev]);
       setSelected(created);
-      setNewForm({ title: "", priority: "normal" });
+      setNewForm({ title: "", priority: "normal", assigned_to: "" });
       setShowNew(false);
     } catch (err) {
       console.error(err);
@@ -149,34 +157,38 @@ export function Demandas() {
     <MainLayout>
       <div className="flex h-screen overflow-hidden">
 
-        {/* ── Left panel: list ── */}
+        {/* ── Left panel ── */}
         <div className="w-80 flex-shrink-0 flex flex-col border-r border-white/10"
           style={{ background: "rgba(6,12,26,0.6)" }}>
 
-          {/* Header */}
           <div className="p-4 border-b border-white/10 flex items-center justify-between">
             <div>
               <h1 className="text-white font-bold text-lg">Demandas</h1>
               <p className="text-gray-500 text-xs mt-0.5">{openDemandas.length} abertas</p>
             </div>
-            <Button onClick={() => setShowNew(true)} size="sm"
-              className="bg-cyan-500 hover:bg-cyan-600 text-white h-8 w-8 p-0">
-              <Plus className="w-4 h-4" />
-            </Button>
+            {isAdmin && (
+              <Button onClick={() => setShowNew(true)} size="sm"
+                className="bg-cyan-500 hover:bg-cyan-600 text-white h-8 w-8 p-0">
+                <Plus className="w-4 h-4" />
+              </Button>
+            )}
           </div>
 
-          {/* List */}
           <div className="flex-1 overflow-y-auto p-2 space-y-1">
             {openDemandas.length > 0 && (
               <>
                 <p className="text-xs text-gray-600 px-2 py-1 uppercase tracking-wider">Abertas</p>
-                {openDemandas.map((d) => <DemandaItem key={d.id} demanda={d} selected={selected?.id === d.id} onClick={() => setSelected(d)} />)}
+                {openDemandas.map((d) => (
+                  <DemandaItem key={d.id} demanda={d} selected={selected?.id === d.id} onClick={() => setSelected(d)} />
+                ))}
               </>
             )}
             {resolvedDemandas.length > 0 && (
               <>
                 <p className="text-xs text-gray-600 px-2 py-1 mt-3 uppercase tracking-wider">Resolvidas</p>
-                {resolvedDemandas.map((d) => <DemandaItem key={d.id} demanda={d} selected={selected?.id === d.id} onClick={() => setSelected(d)} />)}
+                {resolvedDemandas.map((d) => (
+                  <DemandaItem key={d.id} demanda={d} selected={selected?.id === d.id} onClick={() => setSelected(d)} />
+                ))}
               </>
             )}
             {demandas.length === 0 && (
@@ -192,35 +204,37 @@ export function Demandas() {
         {selected ? (
           <div className="flex-1 flex flex-col min-w-0">
 
-            {/* Chat header */}
             <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between"
               style={{ background: "rgba(6,12,26,0.4)" }}>
-              <div className="flex items-center gap-3">
-                <div>
-                  <h2 className="text-white font-semibold">{selected.title}</h2>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge className={PRIORITY_CONFIG[selected.priority].color + " text-xs"}>
-                      {PRIORITY_CONFIG[selected.priority].label}
-                    </Badge>
-                    <span className="text-gray-500 text-xs">criado por {selected.created_by}</span>
-                    <span className="text-gray-600 text-xs">• {timeAgo(selected.created_at)}</span>
-                  </div>
+              <div>
+                <h2 className="text-white font-semibold">{selected.title}</h2>
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                  <Badge className={PRIORITY_CONFIG[selected.priority].color + " text-xs"}>
+                    {PRIORITY_CONFIG[selected.priority].label}
+                  </Badge>
+                  {selected.assigned_to && (
+                    <div className="flex items-center gap-1 text-xs text-cyan-400">
+                      <User className="w-3 h-3" />
+                      {selected.assigned_to}
+                    </div>
+                  )}
+                  <span className="text-gray-500 text-xs">criado por {selected.created_by}</span>
+                  <span className="text-gray-600 text-xs">· {timeAgo(selected.created_at)}</span>
                 </div>
               </div>
-              {selected.status === "open" && (
+              {isAdmin && selected.status === "open" && (
                 <Button onClick={handleResolve} variant="outline" size="sm"
-                  className="border-green-500/30 text-green-400 hover:bg-green-500/10 text-xs">
-                  <CheckCircle className="w-3.5 h-3.5 mr-1.5" />Marcar como resolvida
+                  className="border-green-500/30 text-green-400 hover:bg-green-500/10 text-xs flex-shrink-0">
+                  <CheckCircle className="w-3.5 h-3.5 mr-1.5" />Resolver
                 </Button>
               )}
               {selected.status === "resolved" && (
-                <Badge className="bg-green-500/10 text-green-400 border-green-500/20">
+                <Badge className="bg-green-500/10 text-green-400 border-green-500/20 flex-shrink-0">
                   <CheckCircle className="w-3 h-3 mr-1" />Resolvida
                 </Badge>
               )}
             </div>
 
-            {/* Messages */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
               {messages.length === 0 && (
                 <div className="text-center py-16 text-gray-600">
@@ -233,18 +247,17 @@ export function Demandas() {
                 const showAuthor = i === 0 || messages[i - 1].author !== msg.author;
                 return (
                   <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[70%] ${isMe ? "items-end" : "items-start"} flex flex-col`}>
+                    <div className={`max-w-[70%] flex flex-col ${isMe ? "items-end" : "items-start"}`}>
                       {showAuthor && (
-                        <span className={`text-xs text-gray-500 mb-1 ${isMe ? "text-right" : "text-left"}`}>
+                        <span className="text-xs text-gray-500 mb-1">
                           {msg.author} · {timeAgo(msg.created_at)}
                         </span>
                       )}
                       <div className={`px-4 py-2.5 rounded-2xl text-sm ${
                         isMe
                           ? "bg-cyan-500 text-white rounded-tr-sm"
-                          : "bg-white/8 border border-white/10 text-gray-200 rounded-tl-sm"
-                      }`}
-                        style={isMe ? {} : { background: "rgba(255,255,255,0.05)" }}>
+                          : "border border-white/10 text-gray-200 rounded-tl-sm"
+                      }`} style={isMe ? {} : { background: "rgba(255,255,255,0.05)" }}>
                         {msg.content}
                       </div>
                     </div>
@@ -254,7 +267,6 @@ export function Demandas() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input */}
             {selected.status === "open" ? (
               <div className="px-6 py-4 border-t border-white/10" style={{ background: "rgba(6,12,26,0.4)" }}>
                 <div className="flex gap-3 items-center">
@@ -283,10 +295,12 @@ export function Demandas() {
           <div className="flex-1 flex items-center justify-center text-gray-600 flex-col gap-3">
             <MessageSquare className="w-12 h-12 opacity-20" />
             <p>Selecione uma demanda para ver o chat</p>
-            <Button onClick={() => setShowNew(true)} variant="outline"
-              className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 mt-2">
-              <Plus className="w-4 h-4 mr-2" />Nova Demanda
-            </Button>
+            {isAdmin && (
+              <Button onClick={() => setShowNew(true)} variant="outline"
+                className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 mt-2">
+                <Plus className="w-4 h-4 mr-2" />Nova Demanda
+              </Button>
+            )}
           </div>
         )}
       </div>
@@ -295,7 +309,7 @@ export function Demandas() {
       <Dialog open={showNew} onOpenChange={setShowNew}>
         <DialogContent className="bg-[#0f1c2e] border-white/10 text-white max-w-md">
           <DialogHeader>
-            <DialogTitle>Nova Demanda</DialogTitle>
+            <DialogTitle className="text-white">Nova Demanda</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-2">
             <div>
@@ -309,6 +323,7 @@ export function Demandas() {
                 autoFocus
               />
             </div>
+
             <div>
               <Label className="text-gray-300">Prioridade</Label>
               <Select value={newForm.priority} onValueChange={(v: any) => setNewForm({ ...newForm, priority: v })}>
@@ -316,15 +331,33 @@ export function Demandas() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-[#0f1c2e] border-white/10">
-                  <SelectItem value="urgent">🔴 Urgente</SelectItem>
-                  <SelectItem value="high">🟠 Alta</SelectItem>
-                  <SelectItem value="normal">🔵 Normal</SelectItem>
+                  <SelectItem value="urgent" className="text-white focus:bg-white/10 focus:text-white">🔴 Urgente</SelectItem>
+                  <SelectItem value="high" className="text-white focus:bg-white/10 focus:text-white">🟠 Alta</SelectItem>
+                  <SelectItem value="normal" className="text-white focus:bg-white/10 focus:text-white">🔵 Normal</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+
+            <div>
+              <Label className="text-gray-300">Atribuir a</Label>
+              <Select value={newForm.assigned_to} onValueChange={(v) => setNewForm({ ...newForm, assigned_to: v })}>
+                <SelectTrigger className="bg-[#0a1929]/80 border-white/10 text-white mt-2">
+                  <SelectValue placeholder="Selecionar colaborador..." />
+                </SelectTrigger>
+                <SelectContent className="bg-[#0f1c2e] border-white/10">
+                  <SelectItem value="none" className="text-white focus:bg-white/10 focus:text-white">Sem atribuição</SelectItem>
+                  {users.map((u) => (
+                    <SelectItem key={u.id} value={u.name} className="text-white focus:bg-white/10 focus:text-white">
+                      {u.name} — {u.role}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="flex gap-3 pt-2">
               <Button variant="outline" onClick={() => setShowNew(false)}
-                className="flex-1 border-white/10 hover:bg-white/5">Cancelar</Button>
+                className="flex-1 border-white/10 hover:bg-white/5 text-white">Cancelar</Button>
               <Button onClick={handleCreate} disabled={!newForm.title.trim()}
                 className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white">Criar Demanda</Button>
             </div>
@@ -353,7 +386,12 @@ function DemandaItem({ demanda, selected, onClick }: { demanda: Demanda; selecte
           <p className={`text-sm font-medium truncate ${selected ? "text-cyan-300" : "text-gray-300"}`}>
             {demanda.title}
           </p>
-          <p className="text-xs text-gray-600 mt-0.5">{demanda.created_by} · {timeAgo(demanda.created_at)}</p>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            {demanda.assigned_to && demanda.assigned_to !== "none" && (
+              <span className="text-xs text-cyan-500 truncate">@{demanda.assigned_to}</span>
+            )}
+            <span className="text-xs text-gray-600">{timeAgo(demanda.created_at)}</span>
+          </div>
         </div>
       </div>
     </button>

@@ -6,6 +6,7 @@ export interface Demanda {
   priority: "urgent" | "high" | "normal";
   status: "open" | "resolved";
   created_by: string;
+  assigned_to: string | null;
   created_at: string;
 }
 
